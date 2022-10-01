@@ -24,8 +24,6 @@
 
 #include<appl/xaxis_ticks.hpp>
 
-QT_CHARTS_USE_NAMESPACE
-
 class ChartView : public QChartView
 {
 public:

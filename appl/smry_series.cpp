@@ -87,7 +87,7 @@ void SmrySeries::onHovered(const QPointF &point, bool state)
 
         dt_utc = dt_utc.addMSecs(ms_correction);
 
-        QString qstr = dt_utc.toString("yyyy-MM-dd HH:mm:ss"); 
+        QString qstr = dt_utc.toString("yyyy-MM-dd HH:mm:ss");
 
         if (dt_utc.isDaylightTime())
             qstr = qstr + " ( daylight time ) ";
@@ -117,7 +117,7 @@ void SmrySeries::onHovered(const QPointF &point, bool state)
 
 QPointF SmrySeries::calculate_closest(const QPointF point)
 {
-    auto vect = this->pointsVector();
+    auto vect = this->points();
 
     qreal ref_x = vect[0].x();
     qreal ref_y = vect[0].y();
@@ -147,7 +147,7 @@ QPointF SmrySeries::calculate_closest(const QPointF point)
 
 void SmrySeries::print_data()
 {
-    auto data = this->pointsVector();
+    auto data = this->points();
 
     for (size_t n = 0; n < data.size(); n++){
         std::cout << std::fixed << std::setw(15) << std::setprecision(0) << data[n].x();
@@ -168,7 +168,7 @@ std::tuple<double,double> SmrySeries::get_min_max_value(double xfrom, double xto
     double min_y = std::numeric_limits<double>::max();
     double max_y = std::numeric_limits<double>::min();
 
-    auto data = this->pointsVector();
+    auto data = this->points();
 
     for (size_t n = 0; n < data.size(); n++) {
         if ((static_cast<double>(data[n].x()) >= xfrom) && (static_cast<double>(data[n].x()) <= xto)) {
@@ -201,7 +201,7 @@ std::tuple<double,double> SmrySeries::get_min_max_value(bool ignore_zero)
     double min_y = std::numeric_limits<double>::max();
     double max_y = std::numeric_limits<double>::min();
 
-    auto data = this->pointsVector();
+    auto data = this->points();
 
     for (size_t n = 0; n < data.size(); n++) {
         if (static_cast<double>(data[n].y()) != 0.0) {
@@ -227,7 +227,7 @@ std::tuple<double,double> SmrySeries::get_min_max_value(bool ignore_zero)
 
 void SmrySeries::calcMinAndMax(){
 
-    auto data = this->pointsVector();
+    auto data = this->points();
 
     for (size_t n = 0; n < data.size(); n++) {
 
@@ -241,7 +241,7 @@ void SmrySeries::calcMinAndMax(){
 
 bool SmrySeries::all_values_zero()
 {
-    auto data = this->pointsVector();
+    auto data = this->points();
 
     for (size_t n = 0; n < data.size(); n++)
         if (data[n].y() != 0.0)

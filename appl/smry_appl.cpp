@@ -111,7 +111,7 @@ SmryAppl::SmryAppl(std::vector<std::string> arg_vect, loader_list_type& loaders,
 
     charts_list.push_back ( {} );
 
-    QtCharts::QChart* chart = new QtCharts::QChart();
+    QChart* chart = new QChart();
 
     chart->setMinimumSize(1400, 600);
 
@@ -184,7 +184,7 @@ void SmryAppl::init_new_chart()
 {
     charts_list.push_back ( {} );
 
-    QtCharts::QChart* chart = new QtCharts::QChart();
+    QChart* chart = new QChart();
     chartList.push_back ( chart );
 
     ChartView *chart_view = new ChartView( chart, this );
@@ -632,7 +632,7 @@ bool SmryAppl::add_new_series ( int chart_ind, int smry_ind, std::string vect_na
 
         axisX[chart_ind] = new SmryXaxis(chart_view_list[chart_ind]);
 
-        auto vect_x1 = series[chart_ind].back()->pointsVector();
+        auto vect_x1 = series[chart_ind].back()->points();
         //axisX[chart_ind]->set_min_value ( vect_x1[0].x() );
 
         chartList[chart_ind]->addAxis ( axisX[chart_ind], Qt::AlignBottom );
@@ -955,7 +955,7 @@ void SmryAppl::update_xaxis_range ( SmryXaxis* axis )
 
         if ( x_axis[0] == axis ) {
 
-            auto values = series[chart_ind][n]->pointsVector();
+            auto values = series[chart_ind][n]->points();
 
             for ( size_t m = 0; m < values.size(); m++ ) {
                 if ( values[m].x() < min_val )

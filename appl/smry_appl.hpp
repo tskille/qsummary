@@ -128,7 +128,7 @@ private:
     QLabel* lbl_rootn;
 
 
-    std::vector<QtCharts::QChart*> chartList;
+    std::vector<QChart*> chartList;
     std::vector<ChartView*> chart_view_list;
 
     std::vector<SmryXaxis*> axisX;

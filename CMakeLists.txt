@@ -16,7 +16,7 @@ find_package(OpenMP REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt5 5.12 REQUIRED COMPONENTS Widgets Charts Test REQUIRED)
+find_package(Qt6 6.2 REQUIRED COMPONENTS Widgets Charts Test REQUIRED)
 
 add_library(smry_appl
    appl/smry_appl.cpp
@@ -32,14 +32,14 @@ add_library(smry_appl
 
 add_executable(qsummary main.cpp)
 
-target_link_libraries(smry_appl opmcommon Qt5::Widgets Qt5::Core Qt5::Charts stdc++fs  OpenMP::OpenMP_CXX)
+target_link_libraries(smry_appl opmcommon Qt6::Widgets Qt6::Core Qt6::Charts stdc++fs  OpenMP::OpenMP_CXX)
 
-target_link_libraries(qsummary smry_appl ${Boost_LIBRARIES} Qt5::Widgets Qt5::Core Qt5::Charts OpenMP::OpenMP_CXX)
+target_link_libraries(qsummary smry_appl ${Boost_LIBRARIES} Qt6::Widgets Qt6::Core Qt6::Charts OpenMP::OpenMP_CXX)
 
 
 add_executable(update_ref_define ./tests/update_ref_define.cpp)
 
-target_link_libraries(update_ref_define smry_appl ${Boost_LIBRARIES} Qt5::Widgets Qt5::Core Qt5::Charts OpenMP::OpenMP_CXX)
+target_link_libraries(update_ref_define smry_appl ${Boost_LIBRARIES} Qt6::Widgets Qt6::Core Qt6::Charts OpenMP::OpenMP_CXX)
 
 
 enable_testing(true)
@@ -62,7 +62,7 @@ add_test(NAME cmdf_input_chart COMMAND cmdf_input_chart)
 add_test(NAME scale_yaxis COMMAND scale_yaxis)
 
 
-target_link_libraries(cmdf_define PRIVATE smry_appl Qt5::Test Qt5::Core Qt5::Widgets Qt5::Charts stdc++fs)
-target_link_libraries(cmdf_input_chart PRIVATE smry_appl Qt5::Test Qt5::Core Qt5::Widgets Qt5::Charts stdc++fs)
-target_link_libraries(scale_yaxis PRIVATE smry_appl Qt5::Test Qt5::Core Qt5::Widgets Qt5::Charts stdc++fs)
+target_link_libraries(cmdf_define PRIVATE smry_appl Qt6::Test Qt6::Core Qt6::Widgets Qt6::Charts stdc++fs)
+target_link_libraries(cmdf_input_chart PRIVATE smry_appl Qt6::Test Qt6::Core Qt6::Widgets Qt6::Charts stdc++fs)
+target_link_libraries(scale_yaxis PRIVATE smry_appl Qt6::Test Qt6::Core Qt6::Widgets Qt6::Charts stdc++fs)
 
