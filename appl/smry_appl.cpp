@@ -1083,31 +1083,37 @@ void SmryAppl::adjust_yaxis_props(SmryYaxis* axis, double& min_data, double& max
     max_data = max;
 }
 
-
 template <typename T>
-bool SmryAppl::reopen_loader(int n, std::unique_ptr<T>& smry, const std::filesystem::path& smryfile)
+bool SmryAppl::reopen_loader(int n, std::unique_ptr<T>& smry)
 {
+    qInfo() << "    >> Starting SmryAppl::reopen_loader with n = " << n;
+
     std::unique_ptr<T> smry_tmp;
 
     try {
         smry_tmp = std::make_unique<T> ( m_smry_files[n] );
     } catch (...) {
-        std::string message = "Error with reopen loader, failed when opening summary file " + smryfile.string();
+        std::string message = "Error with reopen loader, failed when opening summary file " + m_smry_files[n].string();
         throw std::runtime_error(message);
     }
+
+    qInfo() << "    >> smry_tmp has been updated ";
 
     auto nstep_tmp = smry_tmp->numberOfTimeSteps();
     auto nstep = smry->numberOfTimeSteps();
 
-    auto ftime = std::filesystem::last_write_time ( smryfile );
+    auto ftime = std::filesystem::last_write_time ( m_smry_files[n] );
     bool updated = false;
 
     if ( ftime > file_stamp_vector[n] ){
         smry = std::move ( smry_tmp );
         updated = true;
+        qInfo() << "    >> update = true, file stamp larger than store file stamp ";
+
     } else if ( nstep_tmp > nstep ){
         smry = std::move ( smry_tmp );
         updated = true;
+        qInfo() << "    >> update = true, number of time steps has increased ";
     }
 
     if (updated) {
@@ -1116,6 +1122,7 @@ bool SmryAppl::reopen_loader(int n, std::unique_ptr<T>& smry, const std::filesys
     }
 
     vect_list.push_back ( smry->keywordList() );
+    qInfo() << "    >> vect_list updated ";
 
     return updated;
 }
@@ -1156,36 +1163,61 @@ bool SmryAppl::reload_and_update_charts()
 {
     // check if some of the files are updated and re-load if this is the case
 
+    qInfo() << "SmryAppl::starting reload_and_update_charts() ";
+
     vect_list.clear();
     bool need_update = false;
     int n_smry = static_cast<int>(m_smry_files.size());
     std::vector<bool> updated_list;
     updated_list.resize(n_smry);
 
+    qInfo() << "  > A total of " << m_smry_files.size() << " summary files in use";
+
     for (size_t n = 0; n < m_smry_files.size(); n++){
+
+        qInfo() << "  > checking smry file " << QString::fromStdString(m_smry_files[n].string());
 
         if (std::filesystem::exists(m_smry_files[n] )) {
 
-            if (m_file_type[n] == FileType::SMSPEC)
-                updated_list[n] = reopen_loader( n, m_esmry_loader[n], m_smry_files[n] );
-            else if (m_file_type[n] == FileType::ESMRY)
-                updated_list[n] = reopen_loader( n, m_ext_esmry_loader[n], m_smry_files[n] );
+            if (m_file_type[n] == FileType::SMSPEC){
+                qInfo() << "  > SMSPEC -> reopen loader ";
+                updated_list[n] = reopen_loader( n, m_esmry_loader[n] );
+
+                if (updated_list[n])
+                    qInfo() << "  > has been updated, need reload ";
+
+            } else if (m_file_type[n] == FileType::ESMRY){
+                qInfo() << "  > ESMRY -> reopen loader ";
+                updated_list[n] = reopen_loader( n, m_ext_esmry_loader[n] );
+
+                if (updated_list[n])
+                    qInfo() << "  > has been updated, need reload ";
+            }
 
             if (updated_list[n])
                 need_update = true;
 
         } else {
 
-            std::string msg = "re-load of smspec " + m_smry_files[n].string() + "failed, file not found ";
+            std::string msg = "re-load of smspec " + m_smry_files[n].string() + " failed, file not found ";
             std::cout << "\n!warning, " << msg << std::endl;
         }
     }
 
-    if (!need_update)
+    if (!need_update){
         return false;
+    }
 
-    if (m_derived_smry != nullptr)
+    std::cout << "\nHere we go, update needed \n";
+
+    qInfo() << "  > Update needed, continue in function SmryAppl::reload_and_update_charts ";
+
+    if (m_derived_smry != nullptr){
         m_derived_smry->recalc(m_file_type, m_esmry_loader, m_ext_esmry_loader);
+        qInfo() << "  > m_derived_smry has been re-calculated ";
+    } else {
+        qInfo() << "  > m_derived_smry is empty, no need for recalculate ";
+    }
 
     std::vector<std::vector<std::tuple<int, std::string, int, bool>>> series_properties;
     std::vector<std::vector<QDateTime>> xrange_state;
@@ -1208,6 +1240,8 @@ bool SmryAppl::reload_and_update_charts()
         }
     }
 
+    qInfo() << "  > collect series properties ok ";
+
     int current_chart_ind = chart_ind;
 
     // updating existing plots
@@ -1220,6 +1254,8 @@ bool SmryAppl::reload_and_update_charts()
         this->delete_chart(n);
         n--;
     }
+
+    qInfo() << "  > delete all charts ok ";
 
     // make_preload_list and load data if smry file is updated
 
@@ -1239,6 +1275,8 @@ bool SmryAppl::reload_and_update_charts()
                 m_ext_esmry_loader[n]->loadData(pre_load_list);
         }
     }
+
+    qInfo() << "  > make preload lists ok ";
 
     // create new charts
 
@@ -1264,9 +1302,13 @@ bool SmryAppl::reload_and_update_charts()
         update_all_yaxis(min_max_range, ind);
     }
 
+    qInfo() << "  > create new charts ok ";
+
     chart_ind = current_chart_ind;
 
     stackedWidget->setCurrentIndex(chart_ind);
+
+    qInfo() << "  > All good return true ";
 
     return true;
 }
