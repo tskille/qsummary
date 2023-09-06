@@ -421,6 +421,13 @@ bool SmryAppl::add_new_series ( int chart_ind, int smry_ind, std::string vect_na
     else if ( vect_name.substr(0,3) == "WPI" )
         smry_unit = "SM3/D/B";   // different unit in flow and Eclipse, using Eclipse version
 
+    // tskille: opm-flow have wrong unit for summary vector CTFAC
+    // adding a if statement as a quick fi
+       
+    if (smry_unit == "CPR3/DAY")
+        smry_unit = "CPM3/D/B";
+    
+
     if ( smry_unit.size() > 0 ) {
         int p1 = smry_unit.find_first_not_of ( " " );
         smry_unit = smry_unit.substr ( p1 );
